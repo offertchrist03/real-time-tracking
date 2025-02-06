@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import pool from "./config.mjs";
 import { generateRandomCoordinate } from "./utils.mjs";
 import dotenv from "dotenv";
@@ -27,8 +27,10 @@ const people = await getPeople();
 const updateLocation = async () => {
   if (!(people && people.length > 0)) {
     console.log("no people");
-    return;
+    return [];
   }
+
+  let moves = [];
 
   // Position initiale (exemple : Antananarivo)
   const initialLatitude = -18.8792;
@@ -46,30 +48,35 @@ const updateLocation = async () => {
     person.latitude = latitude;
     person.longitude = longitude;
 
+    const move = { user_id: person.id, latitude, longitude };
+
     await pool.query(
       "INSERT INTO movements (user_id, latitude, longitude) VALUES ($1, $2, $3)",
-      [person.id, latitude, longitude]
+      [move.user_id, move.latitude, move.longitude]
     );
 
-    console.log(
-      `${person.name} : { latitude:${latitude}, longitude:${longitude} }`
-    );
+    moves.push(move);
   }
 
-  console.log(`All Locations updated`);
+  console.log(moves);
+  return moves;
 };
 
 // 📌 Route pour récupérer tous les utilisateurs
-app.get("/mouvements", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
-    setInterval(updateLocation, INTERVAL);
+    setInterval(async () => {
+      const currentLocation = await updateLocation();
+      res.json(currentLocation);
+    }, INTERVAL);
   } catch (error) {
     console.error(
       "Erreur lors de la récupération des mouvements des utilisateurs :"
     );
+    res.json([]);
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Microservice running on port ${PORT}`);
+  console.log(`Microservice running on port : ${PORT}`);
 });
