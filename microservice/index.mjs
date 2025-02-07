@@ -11,17 +11,29 @@ const INTERVAL = process.env.INTERVAL || 5000;
 
 app.use(express.json());
 
-// recuperer les utilisateurs dans la base de donnee
+// fonction qui recupere les utilisateurs et leurs dernier coordonnees dans la base de donnee
 const getPeople = async () => {
   try {
+    const people = [];
     const { rows } = await pool.query("SELECT id, name FROM users");
 
-    return rows;
+    // Position initiale si aucun dernier coordonnee (exemple : Antananarivo)
+    const initialLatitude = -18.8792;
+    const initialLongitude = 47.5079;
+
+    for (let person of rows) {
+      person.latitude = initialLatitude;
+      person.longitude = initialLongitude;
+      people.push(person);
+    }
+
+    return people;
   } catch (error) {
     return [];
   }
 };
 
+// recuperer les utilisateurs
 const people = await getPeople();
 
 const updateLocation = async () => {
@@ -32,14 +44,7 @@ const updateLocation = async () => {
 
   let moves = [];
 
-  // Position initiale (exemple : Antananarivo)
-  const initialLatitude = -18.8792;
-  const initialLongitude = 47.5079;
-
   for (let person of people) {
-    person.latitude = initialLatitude;
-    person.longitude = initialLongitude;
-
     const { latitude, longitude } = generateRandomCoordinate(
       person.latitude,
       person.longitude
@@ -50,6 +55,7 @@ const updateLocation = async () => {
 
     const move = { user_id: person.id, latitude, longitude };
 
+    // changer les coordonees
     await pool.query(
       "INSERT INTO movements (user_id, latitude, longitude) VALUES ($1, $2, $3)",
       [move.user_id, move.latitude, move.longitude]
@@ -62,20 +68,8 @@ const updateLocation = async () => {
   return moves;
 };
 
-// 📌 Route pour récupérer tous les utilisateurs
-app.get("/", async (req, res) => {
-  try {
-    setInterval(async () => {
-      const currentLocation = await updateLocation();
-      res.json(currentLocation);
-    }, INTERVAL);
-  } catch (error) {
-    console.error(
-      "Erreur lors de la récupération des mouvements des utilisateurs :"
-    );
-    res.json([]);
-  }
-});
+// Route pour récupérer les mouvements des utilisateurs
+setInterval(updateLocation, INTERVAL);
 
 app.listen(PORT, () => {
   console.log(`Microservice running on port : ${PORT}`);
