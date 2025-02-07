@@ -1,11 +1,8 @@
+import Home from "@/components/pages/Home";
 import React from "react";
 
 function page() {
-  return (
-    <>
-      <div className="">real-time-traking</div>
-    </>
-  );
+  return <Home></Home>;
 }
 
 export default page;
