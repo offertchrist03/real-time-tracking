@@ -1,12 +1,12 @@
 import React from "react";
-import LeafletMap from "../maps/LeafletMap";
+import Map from "../maps/Map";
 
 function Home() {
   return (
     <main className="">
       <div className="">real-time-traking</div>
 
-      <LeafletMap></LeafletMap>
+      <Map></Map>
     </main>
   );
 }

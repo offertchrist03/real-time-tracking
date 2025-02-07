@@ -11,16 +11,43 @@ import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import L from "leaflet";
 
-interface Position {
-  lat: number;
-  lng: number;
+interface PositionProps {
+  id: number;
+  user_id: number;
+  latitude: number;
+  longitude: number;
+  movement_at: string;
 }
 
-const LeafletMap = () => {
-  // État pour stocker la liste des positions
-  const [positions, setPositions] = useState<Position[]>([
-    { lat: -18.8792, lng: 47.5079 }, // Position initiale
-  ]);
+interface UserProps {
+  id: number;
+  name: string;
+  passwor: string;
+  role: "user" | "admin";
+}
+
+const LeafletMap = ({
+  users,
+  movements,
+}: {
+  users: UserProps[] | null;
+  movements: PositionProps[] | null;
+}) => {
+  // recuperer uniquement les latitude et longitude
+  const getLatLng = (movements: PositionProps[] | null) => {
+    let res: { lat: number; lng: number }[] = [];
+    if (!movements) {
+      return res;
+    }
+    for (let index = 0; index < movements.length; index++) {
+      const movement = {
+        lat: movements[index].latitude,
+        lng: movements[index].longitude,
+      };
+      res.push(movement);
+    }
+    return res;
+  };
 
   // Création d'un marqueur personnalisé avec un <span> rond jaune
   const customIcon = L.divIcon({
@@ -30,22 +57,6 @@ const LeafletMap = () => {
     iconAnchor: [15, 15], // Point d'ancrage de l'icône
     popupAnchor: [0, -15], // Position du popup
   });
-
-  // Exemple d'actualisation de positions toutes les 5 secondes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Pour l'exemple, on ajoute une nouvelle position légèrement décalée
-      setPositions((prevPositions) => {
-        const last = prevPositions[prevPositions.length - 1];
-        return [
-          ...prevPositions,
-          { lat: last.lat + 0.0002, lng: last.lng + 0.0002 },
-        ];
-      });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <MapContainer
@@ -59,15 +70,27 @@ const LeafletMap = () => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
 
-      {/* Affichage des marqueurs avec l'icône personnalisée pour chaque position */}
-      {positions.map((pos, index) => (
-        <Marker key={index} position={[pos.lat, pos.lng]} icon={customIcon}>
-          <Popup>Position {index + 1}</Popup>
-        </Marker>
-      ))}
+      {/* affiche tous les utilisateurs sur la carte */}
+      {users && users.length > 0 && (
+        <>
+          {/* Affichage des marqueurs avec l'icône personnalisée pour chaque utilisateurs */}
+          {movements &&
+            movements.map((pos, index) => (
+              <Marker
+                key={index}
+                position={[pos.latitude, pos.longitude]}
+                icon={customIcon}
+              >
+                <Popup>Position {index + 1}</Popup>
+              </Marker>
+            ))}
 
-      {/* Draw a red line connecting the last two positions */}
-      {positions.length > 1 && <Polyline positions={positions} color="red" />}
+          {/* relie les positions de l'utilisateur avec une ligne rouge */}
+          {movements && movements.length > 1 && (
+            <Polyline positions={getLatLng(movements)} color="red" />
+          )}
+        </>
+      )}
     </MapContainer>
   );
 };
