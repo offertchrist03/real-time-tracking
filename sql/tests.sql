@@ -1,5 +1,5 @@
 INSERT INTO users (name, password, role) VALUES
-('admin', 'passwordadmin','admin');
+('admin', '1234','admin');
 
 INSERT INTO users (name, password) VALUES
 ('alice', 'password1'),

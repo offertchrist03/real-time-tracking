@@ -1,28 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import LeafletMap from "./LeafletMap";
-
-interface UserProps {
-  id: number;
-  name: string;
-  passwor: string;
-  role: "user" | "admin";
-}
-
-interface PositionProps {
-  id: number;
-  user_id: number;
-  latitude: number;
-  longitude: number;
-  movement_at: string;
-}
+import { UserProps } from "@/types";
 
 function Map() {
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+
   // recuperer tous les utilisateurs
   const fetchUsers = async () => {
     try {
-      const res = await fetch("/api/users");
+      const res = await fetch("/api/users?limit=2");
       const data = await res.json();
 
       setUsers(data);
@@ -36,49 +27,15 @@ function Map() {
     fetchUsers();
   }, []);
 
-  // État pour stocker la liste des positions
-  const [positions, setPositions] = useState<PositionProps[] | null>(null);
+  if (isLoading) {
+    return <>chargement...</>;
+  }
 
-  // Exemple d'actualisation de positions toutes les 5 secondes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Pour l'exemple, on ajoute une nouvelle position légèrement décalée
-      const interval = setInterval(() => {
-        setPositions((prevPositions) => {
-          if (!prevPositions) {
-            return [
-              {
-                id: 1,
-                user_id: 1,
-                latitude: -18.8792,
-                longitude: 47.5079,
-                movement_at: new Date().toISOString(),
-              },
-            ];
-          }
-
-          const last = prevPositions[prevPositions.length - 1];
-
-          return [
-            ...prevPositions,
-            {
-              id: last.id + 1,
-              user_id: last.user_id,
-              latitude: last.latitude + 0.0002,
-              longitude: last.longitude + 0.0002,
-              movement_at: new Date().toISOString(),
-            },
-          ];
-        });
-      }, 5000);
-
-      return () => clearInterval(interval);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return <LeafletMap users={users} movements={positions}></LeafletMap>;
+  return (
+    <Suspense fallback={<>chargement fallback...</>}>
+      <LeafletMap users={users}></LeafletMap>
+    </Suspense>
+  );
 }
 
 export default Map;
