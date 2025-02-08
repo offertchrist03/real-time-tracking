@@ -43,8 +43,9 @@ declare module "next-auth" {
    */
   interface Session {
     user: {
-      /** The user's postal address. */
-      address: string;
+      id: string;
+      name: string;
+      role: string;
     } & User;
   }
 
@@ -63,7 +64,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       },
       async authorize(c) {
         const { rows, rowCount } = await pool.query(
-          "SELECT id, name FROM users WHERE name=$1",
+          "SELECT * FROM users WHERE name=$1",
           [c.name]
         );
 

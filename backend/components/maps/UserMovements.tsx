@@ -32,7 +32,7 @@ function UserMovements({ user }: { user: UserProps }) {
   // Exemple d'actualisation de positions toutes les 5 secondes
   useEffect(() => {
     // Pour l'exemple, on ajoute une nouvelle position légèrement décalée
-    const interval = setInterval(() => {
+    const interval = setTimeout(() => {
       setPositions((prevPositions) => {
         if (!prevPositions) {
           return [
@@ -63,7 +63,7 @@ function UserMovements({ user }: { user: UserProps }) {
       });
     }, 5000);
 
-    return () => clearInterval(interval);
+    return () => clearTimeout(interval);
   }, []);
 
   // recuperer uniquement les latitude et longitude
