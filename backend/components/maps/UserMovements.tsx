@@ -29,41 +29,45 @@ function UserMovements({ user }: { user: UserProps }) {
   // État pour stocker la liste des positions
   const [positions, setPositions] = useState<MouvementProps[] | null>(null);
 
-  // Exemple d'actualisation de positions toutes les 5 secondes
-  useEffect(() => {
-    // Pour l'exemple, on ajoute une nouvelle position légèrement décalée
-    const interval = setTimeout(() => {
-      setPositions((prevPositions) => {
-        if (!prevPositions) {
-          return [
-            {
-              id: 1,
-              user_id: 1,
-              latitude: -18.8792,
-              longitude: 47.5079,
-              movement_at: new Date().toISOString(),
-            },
-          ];
-        }
-
-        const last = prevPositions[prevPositions.length - 1];
-
-        const nextPos = generateRandomCoordinate(last.latitude, last.longitude);
-
+  const moveAction = () => {
+    setPositions((prevPositions) => {
+      if (!prevPositions) {
         return [
-          ...prevPositions,
           {
-            id: last.id + 1,
-            user_id: last.user_id,
-            latitude: nextPos.latitude,
-            longitude: nextPos.longitude,
+            id: user.id,
+            user_id: user.id,
+            latitude: -18.8792,
+            longitude: 47.5079,
             movement_at: new Date().toISOString(),
           },
         ];
-      });
-    }, 5000);
+      }
 
-    return () => clearTimeout(interval);
+      const last = prevPositions[prevPositions.length - 1];
+
+      const nextPos = generateRandomCoordinate(last.latitude, last.longitude);
+
+      return [
+        ...prevPositions,
+        {
+          id: last.id + 1,
+          user_id: last.user_id,
+          latitude: nextPos.latitude,
+          longitude: nextPos.longitude,
+          movement_at: new Date().toISOString(),
+        },
+      ];
+    });
+  };
+
+  // Exemple d'actualisation de positions toutes les 5 secondes
+  useEffect(() => {
+    // Pour l'exemple, on ajoute une nouvelle position légèrement décalée
+    const interval = setInterval(() => {
+      moveAction();
+    }, 20000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // recuperer uniquement les latitude et longitude

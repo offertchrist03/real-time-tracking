@@ -1,94 +1,86 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import Keycloak from "next-auth/providers/keycloak";
-import GitHub from "next-auth/providers/github";
-import pool from "./lib/db";
+import { PrismaClient } from "@prisma/client";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
-// import { PrismaClient } from "@prisma/client"
-// import { PrismaAdapter } from "@auth/prisma-adapter"
-// import SendGrid from "next-auth/providers/sendgrid"
-// import Resend from "next-auth/providers/resend"
-// import Email from "next-auth/providers/email"
+const prisma = new PrismaClient();
 
-// globalThis.prisma ??= new PrismaClient()
-
-// authConfig.providers.push(
-//   // Start server with `pnpm email`
-//   Email({ server: "smtp://127.0.0.1:1025?tls.rejectUnauthorized=false" }),
-//   SendGrid,
-//   Resend
-// )
-
-// export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth(
-//   (request) => {
-//     if (request?.nextUrl.searchParams.get("test")) {
-//       return {
-//         // adapter: PrismaAdapter(globalThis.prisma),
-//         session: { strategy: "jwt" },
-//         ...authConfig,
-//         providers: [],
-//       }
-//     }
-//     return {
-//       // adapter: PrismaAdapter(globalThis.prisma),
-//       session: { strategy: "jwt" },
-//       ...authConfig,
-//     }
-//   }
-// )
+export const config = {
+  runtime: "nodejs",
+};
 
 declare module "next-auth" {
-  /**
-   * Returned by `useSession`, `getSession`, `auth` and received as a prop on the `SessionProvider` React Context
-   */
+  interface User {
+    role: string;
+  }
+
+  interface JWT {
+    id: string;
+    name: string;
+    role: string;
+  }
+
   interface Session {
     user: {
       id: string;
       name: string;
       role: string;
-    } & User;
-  }
-
-  interface User {
-    foo?: string;
+    };
   }
 }
 
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   debug: true,
+
   providers: [
     Credentials({
       credentials: {
-        name: { label: "Name", type: "name" },
-        password: { label: "Password", type: "password" },
+        name: { label: "Nom", type: "text" },
+        password: { label: "Mot de passe", type: "password" },
       },
-      async authorize(c) {
-        const { rows, rowCount } = await pool.query(
-          "SELECT * FROM users WHERE name=$1",
-          [c.name]
-        );
+      async authorize(credentials) {
+        if (!credentials.name || !credentials.password) return null;
 
-        if (!rowCount) return null;
+        // Rechercher l'utilisateur dans la base de données
+        const user = await prisma.users.findUnique({
+          where: { name: String(credentials.name) },
+        });
 
-        if (c.password !== rows[0].password) return null;
+        if (!user || credentials.password !== user.password) return null;
 
-        return {
-          id: rows[0].id,
-          name: rows[0].name,
-          role: rows[0].role,
-        };
+        return { id: String(user.id), name: user.name, role: user.role };
       },
     }),
-    GitHub,
-    Keycloak,
   ],
 
+  pages: {
+    signIn: "/sign-in",
+    signOut: "/sign-out",
+  },
+
   callbacks: {
-    jwt({ token, trigger, session }) {
-      if (trigger === "update") token.name = session.user.name;
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.role = user.role;
+      }
       return token;
     },
+
+    session({ session, token }) {
+      session.user.id = token.id as string;
+      session.user.name = token.name as string;
+      session.user.role = token.role as string;
+      return session;
+    },
+    async redirect() {
+      // Redirect to a custom page after successful sign-in
+      return "/"; // You can change this path
+    },
   },
-  basePath: "/auth",
+
   session: { strategy: "jwt" },
+  basePath: "/auth",
 });

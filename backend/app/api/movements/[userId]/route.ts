@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import pool from "@/lib/db";
+import prisma from "@/prisma";
 
 interface ParamsProps {
   userId: number;
@@ -12,12 +12,17 @@ export async function GET(req: Request, { params }: { params: ParamsProps }) {
   const limit = parseInt(searchParams.get("limit") || "50"); // Valeur par défaut = 50
 
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM movements WHERE user_id = $1 ORDER BY movement_at DESC LIMIT $2",
-      [userId, limit]
-    );
+    const movements = await prisma.movements.findMany({
+      where: {
+        user_id: userId, // Filtrer par l'ID de l'utilisateur
+      },
+      orderBy: {
+        movement_at: "desc", // Trier par 'movement_at' en ordre décroissant
+      },
+      take: limit, // Limiter le nombre de résultats
+    });
 
-    return NextResponse.json(rows, { status: 200 });
+    return NextResponse.json(movements, { status: 200 });
   } catch (error) {
     console.error("Error fetching movements for user:", error);
     return NextResponse.json(

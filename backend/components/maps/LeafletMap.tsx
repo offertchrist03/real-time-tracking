@@ -10,7 +10,7 @@ const LeafletMap = ({ users }: { users: UserProps[] | null }) => {
   return (
     <MapContainer
       center={[-18.8792, 47.5079]} // ANTANANARIVO
-      zoom={20}
+      zoom={17}
       style={{ height: "100%", width: "100%" }}
     >
       {/* TileLayer pour charger la tuile OpenStreetMap */}

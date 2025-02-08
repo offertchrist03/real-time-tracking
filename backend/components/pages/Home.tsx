@@ -1,16 +1,18 @@
 import React from "react";
 import Map from "../maps/Map";
 import Header from "../partials/Header";
-import { useSession } from "next-auth/react";
+import { auth } from "@/auth";
 
-function Home() {
-  const { data: session } = useSession();
+async function Home() {
+  const session = await auth();
 
   return (
-    <main className="relative flex flex-col w-screen h-screen">
-      <Header></Header>
+    <main className="relative flex flex-col w-screen h-screen overflow-hidden">
+      <Header session={session}></Header>
 
-      <Map session={session}></Map>
+      <div className="relative w-full h-full">
+        <Map session={session}></Map>
+      </div>
     </main>
   );
 }

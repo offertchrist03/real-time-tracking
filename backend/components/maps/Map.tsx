@@ -13,9 +13,16 @@ function Map({ session }: { session: Session | null }) {
 
   // recuperer un utilisateur
   const fetchUser = async (id: string) => {
+    if (!id) {
+      console.log("No id");
+      return [];
+    }
+
     try {
       const res = await fetch(`/api/users/${id}`);
       const data = await res.json();
+
+      console.log(data);
 
       setUsers(data);
     } catch (error) {
@@ -41,10 +48,13 @@ function Map({ session }: { session: Session | null }) {
   const [users, setUsers] = useState<UserProps[] | null>(null);
   useEffect(() => {
     if (session && session.user) {
-      if (session.user.role === "admin") {
+      if (session.user.role.toLowerCase() === "admin") {
+        // recupere tous les utilisateur (limit 20)
         fetchUsers();
       } else {
-        fetchUser(session.user.id);
+        // recupere la session
+        const id = session.user.id || session.user.name;
+        fetchUser(id);
       }
     }
   }, []);
