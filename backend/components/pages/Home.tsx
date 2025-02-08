@@ -11,7 +11,7 @@ async function Home() {
       <Header session={session}></Header>
 
       <div className="relative w-full h-full">
-        <Map session={session}></Map>
+        {session && <Map session={session}></Map>}
       </div>
     </main>
   );

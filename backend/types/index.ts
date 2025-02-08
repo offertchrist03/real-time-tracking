@@ -9,6 +9,6 @@ export interface MouvementProps {
 export interface UserProps {
   id: number;
   name: string;
-  password: string;
+  password?: string;
   role: "user" | "admin";
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/prisma";
 
-export const GET = auth(async (req, res) => {
+export const GET = auth(async (req) => {
   if (!req.auth) {
     return Response.json({ message: "Not authenticated" }, { status: 401 });
   }

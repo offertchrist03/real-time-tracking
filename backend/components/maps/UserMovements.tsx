@@ -2,73 +2,87 @@
 
 import { MouvementProps, UserProps } from "@/types";
 import React, { useEffect, useState } from "react";
-import L from "leaflet";
 import { Marker, Polyline, Popup } from "react-leaflet";
+import { mapPin } from "./leafleft-components";
+import ToastLoading from "../loading/ToastLoading";
 
 function UserMovements({ user }: { user: UserProps }) {
-  // genere des positions aleatoires
-  const generateRandomCoordinate = (
-    latitude: number,
-    longitude: number,
-    maxDistance = 50
-  ) => {
-    const earthRadius = 6371000; // Rayon de la Terre en mètres
-    const delta = maxDistance / earthRadius;
-
-    const theta = Math.random() * 2 * Math.PI; // Angle aléatoire
-    const deltaLat = delta * Math.cos(theta);
-    const deltaLng =
-      (delta * Math.sin(theta)) / Math.cos((latitude * Math.PI) / 180);
-
-    const newLatitude = latitude + (deltaLat * 180) / Math.PI;
-    const newLongitude = longitude + (deltaLng * 180) / Math.PI;
-
-    return { latitude: newLatitude, longitude: newLongitude };
-  };
-
+  const [isLoading, setIsLoading] = useState(true);
   // État pour stocker la liste des positions
   const [positions, setPositions] = useState<MouvementProps[] | null>(null);
 
-  const moveAction = () => {
+  // recuperer tous les mouvements utilisateurs
+  const getMovements = async (limit = 50) => {
+    try {
+      const res = await fetch(
+        `/api/movements/${user.id}${limit ? "?limit=" + limit : ""}`
+      );
+      const data: MouvementProps[] = await res.json();
+
+      return data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des utilisateurs :", error);
+      return null;
+    }
+  };
+
+  const getAllPreviousMovements = async () => {
+    const allPositions = await getMovements();
+    if (allPositions && allPositions.length > 0) {
+      setPositions(allPositions);
+    }
+  };
+
+  const getLastMovementThenUpdateMovement = async () => {
+    const lastMouvements = await getMovements(1);
+
+    if (
+      !(
+        positions &&
+        positions.length > 0 &&
+        lastMouvements &&
+        lastMouvements.length > 0
+      ) ||
+      (positions[0].id === lastMouvements[lastMouvements.length - 1].id &&
+        positions[0].latitude ===
+          lastMouvements[lastMouvements.length - 1].latitude &&
+        positions[0].longitude ===
+          lastMouvements[lastMouvements.length - 1].longitude) ||
+      (positions[positions.length - 1].latitude ===
+        lastMouvements[lastMouvements.length - 1].latitude &&
+        positions[positions.length - 1].longitude ===
+          lastMouvements[lastMouvements.length - 1].longitude)
+    ) {
+      return;
+    }
+
     setPositions((prevPositions) => {
-      if (!prevPositions) {
-        return [
-          {
-            id: user.id,
-            user_id: user.id,
-            latitude: -18.8792,
-            longitude: 47.5079,
-            movement_at: new Date().toISOString(),
-          },
-        ];
+      if (lastMouvements && lastMouvements.length > 0 && prevPositions) {
+        return [...prevPositions, ...lastMouvements];
       }
-
-      const last = prevPositions[prevPositions.length - 1];
-
-      const nextPos = generateRandomCoordinate(last.latitude, last.longitude);
-
-      return [
-        ...prevPositions,
-        {
-          id: last.id + 1,
-          user_id: last.user_id,
-          latitude: nextPos.latitude,
-          longitude: nextPos.longitude,
-          movement_at: new Date().toISOString(),
-        },
-      ];
+      return [...lastMouvements];
     });
   };
+
+  useEffect(() => {
+    if (isLoading && positions) {
+      setIsLoading(false);
+    }
+  }, [positions]);
+
+  useEffect(() => {
+    getAllPreviousMovements();
+  }, []);
 
   // Exemple d'actualisation de positions toutes les 5 secondes
   useEffect(() => {
     // Pour l'exemple, on ajoute une nouvelle position légèrement décalée
     const interval = setInterval(() => {
-      moveAction();
-    }, 20000);
+      getLastMovementThenUpdateMovement();
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [positions]);
 
   // recuperer uniquement les latitude et longitude
   const getLatLng = (moves: MouvementProps[] | null) => {
@@ -86,34 +100,34 @@ function UserMovements({ user }: { user: UserProps }) {
     return res;
   };
 
-  // Création d'un marqueur personnalisé avec un <span> rond jaune
-  const customIcon = L.divIcon({
-    className: "custom-icon",
-    html: '<span style="background-color: yellow; border: 3px solid #ffcc00; box-sizing: border-box; border-radius: 50%; width: 30px; height: 30px; display: inline-block; text-align: center; line-height: 30px;"></span>', // <span> rond et jaune
-    iconSize: [30, 30], // Taille de l'icône
-    iconAnchor: [15, 15], // Point d'ancrage de l'icône
-    popupAnchor: [0, -15], // Position du popup
-  });
-
   return (
-    <React.Fragment>
-      {/* Affichage des marqueurs avec l'icône personnalisée pour chaque utilisateurs */}
-      {positions &&
-        positions.map((pos, index) => (
-          <Marker
-            key={index}
-            position={[pos.latitude, pos.longitude]}
-            icon={customIcon}
-          >
-            <Popup>{user.name}</Popup>
-          </Marker>
-        ))}
-
-      {/* relie les positions de l'utilisateur avec une ligne rouge */}
-      {positions && positions.length > 1 && (
-        <Polyline positions={getLatLng(positions)} color="red" />
+    <>
+      {isLoading && (
+        <ToastLoading text="recuperation des coordonnees"></ToastLoading>
       )}
-    </React.Fragment>
+
+      <React.Fragment>
+        {/* Affichage des marqueurs avec l'icône personnalisée pour chaque utilisateurs */}
+        {positions &&
+          positions.map((pos, index) => (
+            <Marker
+              key={index}
+              position={[pos.latitude, pos.longitude]}
+              icon={mapPin({
+                start: index === 1,
+                last: index === positions.length - 1,
+              })}
+            >
+              <Popup>{user.name}</Popup>
+            </Marker>
+          ))}
+
+        {/* relie les positions de l'utilisateur avec une ligne rouge */}
+        {positions && positions.length > 1 && (
+          <Polyline positions={getLatLng(positions)} color="red" />
+        )}
+      </React.Fragment>
+    </>
   );
 }
 

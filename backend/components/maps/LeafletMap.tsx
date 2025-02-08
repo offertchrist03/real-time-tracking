@@ -2,11 +2,18 @@
 
 import { MapContainer, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { UserProps } from "@/types";
 import UserMovements from "./UserMovements";
+import Loading from "../loading/Loading";
 
 const LeafletMap = ({ users }: { users: UserProps[] | null }) => {
+  console.log("users =>> ", users);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+
   return (
     <MapContainer
       center={[-18.8792, 47.5079]} // ANTANANARIVO
@@ -15,9 +22,11 @@ const LeafletMap = ({ users }: { users: UserProps[] | null }) => {
     >
       {/* TileLayer pour charger la tuile OpenStreetMap */}
       <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://christ-offert.vercel.app/"
+        attribution='&copy; <a href="https://christ-offert.vercel.app/">christ-offert</a>'
       />
+
+      {isLoading && <Loading></Loading>}
 
       {/* affiche tous les utilisateurs sur la carte */}
       {users &&

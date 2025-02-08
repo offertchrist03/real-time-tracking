@@ -15,6 +15,12 @@ export async function GET(req: Request, { params }: { params: ParamsProps }) {
       // Tentative de requête avec 'id' pour récupérer un
       const user = await prisma.users.findUnique({
         where: { id: Number(id) },
+        select: {
+          id: true, // Sélectionner uniquement l'id
+          name: true, // Sélectionner uniquement le nom
+          password: false,
+          role: true,
+        },
       });
 
       // Retourner les données de l'utilisateur en format JSON
@@ -25,6 +31,12 @@ export async function GET(req: Request, { params }: { params: ParamsProps }) {
       // Si une erreur survient, tenter une recherche avec 'name' à la place de 'id'
       const user = await prisma.users.findUnique({
         where: { name: id },
+        select: {
+          id: true, // Sélectionner uniquement l'id
+          name: true, // Sélectionner uniquement le nom
+          password: false,
+          role: true,
+        },
       });
 
       // Retourner les données trouvées par 'name'

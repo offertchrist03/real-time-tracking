@@ -1,4 +1,4 @@
-import express, { json } from "express";
+import express from "express";
 import pool from "./config.mjs";
 import { generateRandomCoordinate } from "./utils.mjs";
 import dotenv from "dotenv";
@@ -15,7 +15,9 @@ app.use(express.json());
 const getPeople = async () => {
   try {
     const people = [];
-    const { rows } = await pool.query("SELECT id, name FROM users");
+    const { rows } = await pool.query(
+      "SELECT id, name FROM users WHERE role = user;"
+    );
 
     // Position initiale si aucun dernier coordonnee (exemple : Antananarivo)
     const initialLatitude = -18.8792;
