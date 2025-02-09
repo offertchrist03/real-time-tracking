@@ -82,6 +82,10 @@ function UserMovements({ user }: { user: UserProps }) {
   useEffect(() => {
     // Pour l'exemple, on ajoute une nouvelle position légèrement décalée
     const interval = setInterval(() => {
+      if (!(positions && positions.length > 0)) {
+        getAllPreviousMovements();
+      }
+
       getLastMovementThenUpdateMovement();
     }, 5000);
 

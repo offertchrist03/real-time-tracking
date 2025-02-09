@@ -5,11 +5,12 @@ import { UserProps } from "@/types";
 import { Session } from "next-auth";
 import ToastLoading from "../loading/ToastLoading";
 import LeafletMap from "./LeafletMap";
-import Link from "next/link";
+import MapCaption from "./MapCaption";
 
 function Map({ session }: { session: Session | null }) {
   const [isLoading, setIsLoading] = useState(true);
 
+  const [selectUser, setSelectUser] = useState<number | null>(null);
   const [users, setUsers] = useState<UserProps[] | null>(null);
   const [errFetchUsers, setErrFetchUsers] = useState(false);
 
@@ -80,6 +81,17 @@ function Map({ session }: { session: Session | null }) {
     }
   }, []);
 
+  const filterUsers = (id: number | null, users: UserProps[] | null) => {
+    if (!users) {
+      return null;
+    }
+    if (!id) {
+      return users;
+    }
+    const filteredUsers = users.filter((user) => user.id === selectUser);
+    return filteredUsers;
+  };
+
   if (isLoading) {
     return (
       <>
@@ -90,23 +102,39 @@ function Map({ session }: { session: Session | null }) {
 
   return (
     <>
-      {!session && (
-        <section className="lg:px-8 fixed top-0 left-0 z-50 flex items-center justify-center w-screen h-screen min-h-full px-6 py-12 pointer-events-none">
-          <div className="sm:mx-auto sm:w-full sm:max-w-sm space-y-3">
-            <h2 className="text-2xl/9 mt-7 font-semibold tracking-tight text-center text-gray-900 pointer-events-auto">
-              connectez vous pour voir les coordonnees.
-            </h2>
+      {!session && <MapCaption></MapCaption>}
 
-            <Link
-              className="text-base/6 font-medium bg-blue-600 px-3 py-1.5 rounded-md text-white hover:bg-blue-700 flex justify-center pointer-events-auto"
-              href={"/sign-in"}
-            >
-              se connecter maintenant !
-            </Link>
+      {session &&
+        session.user &&
+        session.user.role === "admin" &&
+        users &&
+        users.length > 1 && (
+          <div className="top-20 right-5 border-zinc-400 bg-zinc-100 w-fit fixed z-50 p-4 border-2 rounded-lg">
+            <div className="space-y-1">
+              <label htmlFor="userLimit" className="text-sm">
+                selectionner utilisateur
+              </label>
+              <select
+                name="userLimit"
+                id="userLimit"
+                onChange={(e) => {
+                  e.preventDefault();
+                  setSelectUser(parseInt(e.target.value));
+                }}
+                className="block w-full min-w-20 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6 border border-gray-400"
+              >
+                <option value={""}>{"tout"}</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </section>
-      )}
-      <LeafletMap users={users}></LeafletMap>
+        )}
+
+      <LeafletMap users={filterUsers(selectUser, users)}></LeafletMap>
     </>
   );
 }

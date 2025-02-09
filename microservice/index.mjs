@@ -48,10 +48,10 @@ const getPeople = async () => {
   }
 };
 
-// recuperer les utilisateurs
-const people = await getPeople();
-
 const updateLocation = async () => {
+  // recuperer les utilisateurs
+  const people = await getPeople();
+
   if (!(people && people.length > 0)) {
     console.log("no people");
     return [];
