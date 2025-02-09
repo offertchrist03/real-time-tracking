@@ -108,6 +108,15 @@ function UserMovements({ user }: { user: UserProps }) {
     return res;
   };
 
+  function sortByMovementAtAsc(arr: MouvementProps[]) {
+    return arr
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(a.movement_at).getTime() - new Date(b.movement_at).getTime()
+      );
+  }
+
   if (isLoading) {
     return <ToastLoading text="recuperation des coordonnees"></ToastLoading>;
   }
@@ -119,12 +128,12 @@ function UserMovements({ user }: { user: UserProps }) {
   return (
     <React.Fragment>
       {/* Affichage des marqueurs avec l'icône personnalisée pour chaque utilisateurs */}
-      {positions.map((pos, index) => (
+      {sortByMovementAtAsc(positions).map((pos, index) => (
         <Marker
           key={index}
           position={[pos.latitude, pos.longitude]}
           icon={mapPin({
-            start: index === 0,
+            start: false,
             last: index === positions.length - 1,
           })}
         >
@@ -134,7 +143,10 @@ function UserMovements({ user }: { user: UserProps }) {
 
       {/* relie les positions de l'utilisateur avec une ligne rouge */}
       {positions && positions.length > 1 && (
-        <Polyline positions={getLatLng(positions)} color="red" />
+        <Polyline
+          positions={getLatLng(sortByMovementAtAsc(positions))}
+          color="red"
+        />
       )}
     </React.Fragment>
   );

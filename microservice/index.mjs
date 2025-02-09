@@ -1,13 +1,13 @@
 import express from "express";
 import pool from "./config.mjs";
-import { generateRandomCoordinate } from "./utils.mjs";
+import { generateNextCoordinate, generateRandomCoordinate } from "./utils.mjs";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const INTERVAL = process.env.INTERVAL || 5000;
+const INTERVAL = process.env.INTERVAL;
 
 app.use(express.json());
 
@@ -28,16 +28,28 @@ const getPeople = async () => {
       // recuperer le dernier coordonees
       const { rows: lastCoordinates, rowCount: lastCoordinatesCount } =
         await pool.query(
-          "SELECT * FROM movements WHERE user_id = $1 ORDER BY movement_at DESC LIMIT 1",
+          "SELECT * FROM movements WHERE user_id = $1 ORDER BY movement_at DESC LIMIT 2",
           [person.id]
         );
 
-      person.latitude = lastCoordinatesCount
-        ? lastCoordinates[0].latitude
-        : initialLatitude;
-      person.longitude = lastCoordinatesCount
-        ? lastCoordinates[0].longitude
-        : initialLongitude;
+      // set previous lat and long
+      console.log("lastCoordinates[0] =>", lastCoordinates[0]);
+      console.log("lastCoordinates[1] =>", lastCoordinates[1]);
+
+      if (lastCoordinates && lastCoordinates[1]) {
+        person.prevLatitude = lastCoordinates[1].latitude;
+        person.prevLongitude = lastCoordinates[1].longitude;
+      }
+
+      // set current coordonates if not get initials
+      person.latitude =
+        lastCoordinatesCount && lastCoordinates[0]
+          ? lastCoordinates[0].latitude
+          : initialLatitude;
+      person.longitude =
+        lastCoordinatesCount && lastCoordinates[0]
+          ? lastCoordinates[0].longitude
+          : initialLongitude;
 
       people.push(person);
     }
@@ -60,12 +72,44 @@ const updateLocation = async () => {
   let moves = [];
 
   for (let person of people) {
-    const { latitude, longitude } = generateRandomCoordinate(
-      person.latitude,
-      person.longitude
-    );
+    const prevCoord = {
+      latitude: person.prevLatitude,
+      longitude: person.prevLongitude,
+    };
+    console.log("prevCoord => ", prevCoord);
 
-    const move = { user_id: person.id, latitude, longitude };
+    const currentCoord = {
+      latitude: person.latitude,
+      longitude: person.longitude,
+    };
+    console.log("currentCoord => ", currentCoord);
+
+    const getNextCoord = () => {
+      if (
+        prevCoord.latitude &&
+        prevCoord.longitude &&
+        currentCoord.latitude &&
+        currentCoord.longitude
+      ) {
+        console.log("generateNextCoordinate()");
+        return generateNextCoordinate(prevCoord, currentCoord);
+      } else {
+        console.log("generateRandomCoordinate()");
+        return generateRandomCoordinate(
+          currentCoord.latitude,
+          currentCoord.longitude
+        );
+      }
+    };
+
+    const nextCoord = getNextCoord();
+    console.log("nextCoord => ", nextCoord);
+
+    const move = {
+      user_id: person.id,
+      latitude: nextCoord.latitude,
+      longitude: nextCoord.longitude,
+    };
 
     // changer les coordonees
     await pool.query(
@@ -84,5 +128,7 @@ const updateLocation = async () => {
 setInterval(updateLocation, INTERVAL);
 
 app.listen(PORT, () => {
-  console.log(`Microservice running on port : ${PORT}`);
+  console.log(
+    `Microservice running on port : ${PORT} ( update interval : ${INTERVAL}ms )`
+  );
 });
