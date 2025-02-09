@@ -7,8 +7,16 @@ export default async function SignOutPage() {
 
   return (
     <LogsLayout
-      sessionGreeting={`Bye "${session?.user.name}"`}
-      noSessionGreeting={`Identifiez-vous pour accéder à l'application`}
+      sessionGreeting={
+        <span className="p-2 py-1 text-gray-900 bg-yellow-400">{`Bye "${session?.user.name}"`}</span>
+      }
+      noSessionGreeting={
+        <>
+          <span className="w-fit block p-2 py-1 mx-auto mb-3 text-lg text-gray-900 bg-yellow-400">{`PAS DE COMPTE`}</span>
+
+          <p className="">{`Identifiez-vous pour accéder à l'application`}</p>
+        </>
+      }
       sessionChildren={
         <div className="sm:mx-auto sm:w-full sm:max-w-sm mt-7 space-y-5 text-center">
           <h5>{`Êtes-vous sûr de vouloir vous déconnecter ?`}</h5>

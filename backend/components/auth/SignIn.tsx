@@ -9,11 +9,15 @@ async function SignInPage() {
 
   return (
     <LogsLayout
-      sessionGreeting={`hello "${session?.user.name}"`}
-      noSessionGreeting={`Identifiez-vous pour accéder à l'application`}
+      sessionGreeting={
+        <span className="p-2 py-1 text-gray-900 bg-yellow-400">{`hello "${session?.user.name}"`}</span>
+      }
+      noSessionGreeting={
+        <span className="w-fit block p-2 py-1 mx-auto text-lg text-gray-900 bg-yellow-400">{`CONNEXION - TRACKING APP`}</span>
+      }
       sessionChildren={
         <div className="mt-10 space-y-10">
-          <p className="font-medium text-center">
+          <p className="font-medium text-center text-gray-900">
             {`Vous êtes déjà connecté ! Vous pouvez accéder à votre compte et commencer à utiliser toutes les fonctionnalités.`}
           </p>
 

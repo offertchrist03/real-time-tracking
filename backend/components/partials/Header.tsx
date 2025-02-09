@@ -7,7 +7,7 @@ import mapIcon from "@/assets/images/map_icon.png";
 function Header({ session }: { session: Session | null }) {
   return (
     <>
-      <div className=" bg-zinc-100 min-h-16 border-zinc-300 flex items-center justify-between w-full h-16 px-5 border-b">
+      <div className=" min-h-16 flex items-center justify-between w-full h-16 px-5 bg-gray-100 border-b border-gray-300">
         <Link
           href={"/"}
           className="w-fit h-fit flex items-center text-sm font-bold uppercase"
@@ -23,7 +23,7 @@ function Header({ session }: { session: Session | null }) {
             ></Image>
           </span>
 
-          <span className="">traking-app</span>
+          <span className="text-base text-gray-900">traking-app</span>
         </Link>
 
         <div className="flex items-baseline gap-5">

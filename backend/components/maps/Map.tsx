@@ -6,6 +6,7 @@ import { Session } from "next-auth";
 import ToastLoading from "../loading/ToastLoading";
 import LeafletMap from "./LeafletMap";
 import MapCaption from "./MapCaption";
+import MapUsersFilter from "./MapUsersFilter";
 
 function Map({ session }: { session: Session | null }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -109,29 +110,11 @@ function Map({ session }: { session: Session | null }) {
         session.user.role === "admin" &&
         users &&
         users.length > 1 && (
-          <div className="top-20 right-5 border-zinc-400 bg-zinc-100 w-fit fixed z-50 p-4 border-2 rounded-lg">
-            <div className="space-y-1">
-              <label htmlFor="userLimit" className="text-sm">
-                selectionner utilisateur
-              </label>
-              <select
-                name="userLimit"
-                id="userLimit"
-                onChange={(e) => {
-                  e.preventDefault();
-                  setSelectUser(parseInt(e.target.value));
-                }}
-                className="block w-full min-w-20 rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6 border border-gray-400"
-              >
-                <option value={""}>{"tout"}</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <MapUsersFilter
+            users={users}
+            selectUser={selectUser}
+            setSelectUser={setSelectUser}
+          ></MapUsersFilter>
         )}
 
       <LeafletMap users={filterUsers(selectUser, users)}></LeafletMap>
