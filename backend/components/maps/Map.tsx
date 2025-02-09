@@ -1,10 +1,11 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
-import LeafletMap from "./LeafletMap";
+import React, { useEffect, useState } from "react";
 import { UserProps } from "@/types";
 import { Session } from "next-auth";
 import ToastLoading from "../loading/ToastLoading";
+import LeafletMap from "./LeafletMap";
+import Link from "next/link";
 
 function Map({ session }: { session: Session | null }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -13,7 +14,7 @@ function Map({ session }: { session: Session | null }) {
   const [errFetchUsers, setErrFetchUsers] = useState(false);
 
   useEffect(() => {
-    if (isLoading && users) {
+    if (isLoading) {
       setIsLoading(false);
     }
   }, [users]);
@@ -38,8 +39,6 @@ function Map({ session }: { session: Session | null }) {
       if (!data) {
         setErrFetchUsers(true);
       }
-
-      console.log(data);
 
       setUsers([data]);
     } catch (error) {
@@ -72,7 +71,7 @@ function Map({ session }: { session: Session | null }) {
     if (session && session.user) {
       if (session.user.role.toLowerCase() === "admin") {
         // recupere tous les utilisateur (default limit 20)
-        fetchUsers(2);
+        fetchUsers(20);
       } else {
         // recupere la session
         const id = session.user.id || session.user.name;
@@ -84,17 +83,31 @@ function Map({ session }: { session: Session | null }) {
   if (isLoading) {
     return (
       <>
-        {session && (
-          <ToastLoading text="recuperation des utilisateurs"></ToastLoading>
-        )}
+        <ToastLoading text="recuperation des utilisateurs"></ToastLoading>
       </>
     );
   }
 
   return (
-    <Suspense fallback={<>chargement fallback...</>}>
+    <>
+      {!session && (
+        <section className="lg:px-8 fixed top-0 left-0 z-50 flex items-center justify-center w-screen h-screen min-h-full px-6 py-12 pointer-events-none">
+          <div className="sm:mx-auto sm:w-full sm:max-w-sm space-y-3">
+            <h2 className="text-2xl/9 mt-7 font-semibold tracking-tight text-center text-gray-900 pointer-events-auto">
+              connectez vous pour voir les coordonnees.
+            </h2>
+
+            <Link
+              className="text-base/6 font-medium bg-blue-600 px-3 py-1.5 rounded-md text-white hover:bg-blue-700 flex justify-center pointer-events-auto"
+              href={"/sign-in"}
+            >
+              se connecter maintenant !
+            </Link>
+          </div>
+        </section>
+      )}
       <LeafletMap users={users}></LeafletMap>
-    </Suspense>
+    </>
   );
 }
 

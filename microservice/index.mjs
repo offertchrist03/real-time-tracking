@@ -16,16 +16,29 @@ const getPeople = async () => {
   try {
     const people = [];
     const { rows } = await pool.query(
-      "SELECT id, name FROM users WHERE role = user;"
+      "SELECT id, name FROM users WHERE role=$1",
+      ["user"]
     );
 
-    // Position initiale si aucun dernier coordonnee (exemple : Antananarivo)
+    // Position initiale  (exemple : Antananarivo)
     const initialLatitude = -18.8792;
     const initialLongitude = 47.5079;
 
     for (let person of rows) {
-      person.latitude = initialLatitude;
-      person.longitude = initialLongitude;
+      // recuperer le dernier coordonees
+      const { rows: lastCoordinates, rowCount: lastCoordinatesCount } =
+        await pool.query(
+          "SELECT * FROM movements WHERE user_id = $1 ORDER BY movement_at DESC LIMIT 1",
+          [person.id]
+        );
+
+      person.latitude = lastCoordinatesCount
+        ? lastCoordinates[0].latitude
+        : initialLatitude;
+      person.longitude = lastCoordinatesCount
+        ? lastCoordinates[0].longitude
+        : initialLongitude;
+
       people.push(person);
     }
 
@@ -51,9 +64,6 @@ const updateLocation = async () => {
       person.latitude,
       person.longitude
     );
-
-    person.latitude = latitude;
-    person.longitude = longitude;
 
     const move = { user_id: person.id, latitude, longitude };
 

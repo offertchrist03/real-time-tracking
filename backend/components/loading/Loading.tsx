@@ -7,6 +7,7 @@ function Loading() {
     <section className="fixed top-0 left-0 z-50 flex flex-col items-center justify-center w-screen h-screen gap-5 bg-white">
       <div className="aspect-video object-center h-20 mx-auto">
         <Image
+          priority={true}
           className="object-contain object-center w-full h-full"
           alt="map_icon.png"
           src={mapIcon.src}

@@ -19,6 +19,10 @@ function UserMovements({ user }: { user: UserProps }) {
       );
       const data: MouvementProps[] = await res.json();
 
+      if (data || !data) {
+        setIsLoading(false);
+      }
+
       return data;
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -100,34 +104,35 @@ function UserMovements({ user }: { user: UserProps }) {
     return res;
   };
 
+  if (isLoading) {
+    return <ToastLoading text="recuperation des coordonnees"></ToastLoading>;
+  }
+
+  if (!(positions && positions.length > 0)) {
+    return <></>;
+  }
+
   return (
-    <>
-      {isLoading && (
-        <ToastLoading text="recuperation des coordonnees"></ToastLoading>
+    <React.Fragment>
+      {/* Affichage des marqueurs avec l'icône personnalisée pour chaque utilisateurs */}
+      {positions.map((pos, index) => (
+        <Marker
+          key={index}
+          position={[pos.latitude, pos.longitude]}
+          icon={mapPin({
+            start: index === 0,
+            last: index === positions.length - 1,
+          })}
+        >
+          <Popup>{user.name}</Popup>
+        </Marker>
+      ))}
+
+      {/* relie les positions de l'utilisateur avec une ligne rouge */}
+      {positions && positions.length > 1 && (
+        <Polyline positions={getLatLng(positions)} color="red" />
       )}
-
-      <React.Fragment>
-        {/* Affichage des marqueurs avec l'icône personnalisée pour chaque utilisateurs */}
-        {positions &&
-          positions.map((pos, index) => (
-            <Marker
-              key={index}
-              position={[pos.latitude, pos.longitude]}
-              icon={mapPin({
-                start: index === 1,
-                last: index === positions.length - 1,
-              })}
-            >
-              <Popup>{user.name}</Popup>
-            </Marker>
-          ))}
-
-        {/* relie les positions de l'utilisateur avec une ligne rouge */}
-        {positions && positions.length > 1 && (
-          <Polyline positions={getLatLng(positions)} color="red" />
-        )}
-      </React.Fragment>
-    </>
+    </React.Fragment>
   );
 }
 

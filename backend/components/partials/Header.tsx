@@ -7,13 +7,14 @@ import mapIcon from "@/assets/images/map_icon.png";
 function Header({ session }: { session: Session | null }) {
   return (
     <>
-      <div className=" bg-neutral-100 min-h-12 flex items-center justify-between w-full h-12 px-5">
+      <div className=" bg-zinc-100 min-h-16 border-zinc-300 flex items-center justify-between w-full h-16 px-5 border-b">
         <Link
           href={"/"}
-          className="w-fit h-fit text-sm font-bold uppercase flex items-center "
+          className="w-fit h-fit flex items-center text-sm font-bold uppercase"
         >
           <span className="aspect-video object-center h-10">
             <Image
+              priority={true}
               className="object-contain object-center w-full h-full"
               alt="map_icon.png"
               src={mapIcon.src}
@@ -34,7 +35,7 @@ function Header({ session }: { session: Session | null }) {
                 </span>
 
                 {session.user.role.toLocaleLowerCase() === "admin" && (
-                  <span className="ml-3 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-800 ring-1 ring-blue-600/20 ring-inset uppercase font-bold">
+                  <span className="bg-blue-50 ring-1 ring-blue-600/20 ring-inset inline-flex items-center px-2 py-1 ml-3 text-xs font-medium font-bold text-blue-800 uppercase rounded-md">
                     {session.user.role}
                   </span>
                 )}

@@ -5,14 +5,22 @@ import "leaflet/dist/leaflet.css";
 import React, { useEffect, useState } from "react";
 import { UserProps } from "@/types";
 import UserMovements from "./UserMovements";
-import Loading from "../loading/Loading";
+import ToastLoading from "../loading/ToastLoading";
 
 const LeafletMap = ({ users }: { users: UserProps[] | null }) => {
-  console.log("users =>> ", users);
   const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     setIsLoading(false);
   }, []);
+
+  if (isLoading) {
+    return (
+      <>
+        <ToastLoading text="generer la carte"></ToastLoading>
+      </>
+    );
+  }
 
   return (
     <MapContainer
@@ -20,13 +28,10 @@ const LeafletMap = ({ users }: { users: UserProps[] | null }) => {
       zoom={17}
       style={{ height: "100%", width: "100%" }}
     >
-      {/* TileLayer pour charger la tuile OpenStreetMap */}
       <TileLayer
         url="https://christ-offert.vercel.app/"
         attribution='&copy; <a href="https://christ-offert.vercel.app/">christ-offert</a>'
       />
-
-      {isLoading && <Loading></Loading>}
 
       {/* affiche tous les utilisateurs sur la carte */}
       {users &&
