@@ -18,7 +18,7 @@ function MapUsersFilter({
   }
 
   return (
-    <div className="top-20 right-5 backdrop-blur w-fit min-w-40 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6 hover:border-blue-600 fixed z-50 block text-base text-gray-900 bg-white border border-gray-400 rounded-md">
+    <div className="top-20 right-5 backdrop-blur w-fit min-w-40 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6 hover:border-blue-600 fixed z-[999] block text-base text-gray-900 bg-white border border-gray-400 rounded-md">
       <div className="flex overflow-hidden">
         <span
           className="block px-3 py-1.5 cursor-pointer w-full"

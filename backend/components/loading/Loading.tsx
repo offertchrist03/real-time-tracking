@@ -4,7 +4,7 @@ import mapIcon from "@/assets/images/map_icon.png";
 
 function Loading() {
   return (
-    <section className="fixed top-0 left-0 z-50 flex flex-col items-center justify-center w-screen h-screen gap-5 bg-white">
+    <section className="fixed top-0 left-0 z-[9999] flex flex-col items-center justify-center w-screen h-screen gap-5 bg-white">
       <div className="aspect-video object-center h-20 mx-auto">
         <Image
           priority={true}

@@ -11,7 +11,7 @@ function MapCaption() {
         </p>
 
         <Link
-          className="text-base/6 font-medium bg-blue-600 px-3 py-1.5 rounded-md text-white hover:bg-blue-700 flex justify-center pointer-events-auto"
+          className="text-base/6 font-medium bg-blue-600 px-3 py-2 rounded-md text-white hover:bg-blue-700 flex justify-center pointer-events-auto"
           href={"/sign-in"}
         >
           se connecter maintenant !

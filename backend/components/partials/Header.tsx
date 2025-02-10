@@ -23,7 +23,9 @@ function Header({ session }: { session: Session | null }) {
             ></Image>
           </span>
 
-          <span className="text-base text-gray-900">traking-app</span>
+          <span className="text-base text-gray-900 truncate hidden sm:inline">
+            traking-app
+          </span>
         </Link>
 
         <div className="flex items-baseline gap-5">
@@ -42,7 +44,7 @@ function Header({ session }: { session: Session | null }) {
               </div>
 
               <Link
-                className="text-base/6 font-medium bg-red-600 px-3 py-1.5 rounded-md text-white hover:bg-red-700"
+                className="text-base/6 truncate font-medium bg-red-600 px-3 py-1.5 rounded-md text-white hover:bg-red-700"
                 href={"/sign-out"}
               >
                 se deconnecter
@@ -50,7 +52,7 @@ function Header({ session }: { session: Session | null }) {
             </>
           ) : (
             <Link
-              className="text-base/6 font-medium bg-blue-600 px-3 py-1.5 rounded-md text-white hover:bg-blue-700"
+              className="text-base/6 truncate font-medium bg-blue-600 px-3 py-1.5 rounded-md text-white hover:bg-blue-700"
               href={"/sign-in"}
             >
               se connecter
