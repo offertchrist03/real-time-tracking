@@ -1,16 +1,26 @@
 // api/users/[id]/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/prisma";
+import { auth } from "@/auth";
 
-interface ParamsProps {
-  id: string;
-}
+export async function GET(
+  req: Request,
+  {
+    params,
+  }: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const session = await auth();
 
-export async function GET(req: Request, { params }: { params: ParamsProps }) {
+  if (!session) {
+    return Response.json({ message: "Not authenticated" }, { status: 401 });
+  }
+
+  // Destructuration de 'params' pour accéder à 'id'
+  const id = (await params).id;
+
   try {
-    // Destructuration de 'params' pour accéder à 'id'
-    const { id } = params;
-
     try {
       // Tentative de requête avec 'id' pour récupérer un
       const user = await prisma.users.findUnique({

@@ -29,7 +29,7 @@ const LeafletMap = ({ users }: { users: UserProps[] | null }) => {
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
-        url="https://christ-offert.vercel.app/"
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://christ-offert.vercel.app/">christ-offert</a>'
       />
 

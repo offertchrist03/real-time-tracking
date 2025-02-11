@@ -94,11 +94,7 @@ function Map({ session }: { session: Session | null }) {
   };
 
   if (isLoading) {
-    return (
-      <>
-        <ToastLoading text="recuperation des utilisateurs"></ToastLoading>
-      </>
-    );
+    return <ToastLoading text="recuperation des utilisateurs"></ToastLoading>;
   }
 
   return (

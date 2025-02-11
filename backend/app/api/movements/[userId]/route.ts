@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
 import prisma from "@/prisma";
+import { auth } from "@/auth";
 
-interface ParamsProps {
-  userId: string;
-}
+export async function GET(
+  req: Request,
+  {
+    params,
+  }: {
+    params: Promise<{ userId: string }>;
+  }
+) {
+  const session = await auth();
 
-export async function GET(req: Request, { params }: { params: ParamsProps }) {
-  const { userId } = params; // Récupérer l'ID de l'utilisateur depuis l'URL
+  if (!session) {
+    return Response.json({ message: "Not authenticated" }, { status: 401 });
+  }
+
+  const userId = (await params).userId; // Récupérer l'ID de l'utilisateur depuis l'URL
 
   const { searchParams } = new URL(req.url);
   const limit = parseInt(searchParams.get("limit") || "50"); // Valeur par défaut = 50

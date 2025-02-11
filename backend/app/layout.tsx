@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import MainLayout from "@/components/layouts/MainLayout";
 
 export const metadata: Metadata = {
   title: "Tracking-APP",
@@ -11,9 +12,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={`antialiased`}>{children}</body>
-    </html>
-  );
+  return <MainLayout>{children}</MainLayout>;
 }

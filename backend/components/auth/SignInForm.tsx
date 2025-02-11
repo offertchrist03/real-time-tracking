@@ -17,7 +17,7 @@ function SignInForm() {
           } catch (error) {
             if (error instanceof AuthError) {
               console.log(error);
-              return redirect(`/sign-in?err=${error.name}`);
+              return redirect(`/sign-in?err=${error.type}`);
             }
             throw error;
           }

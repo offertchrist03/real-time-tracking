@@ -30,6 +30,7 @@ declare module "next-auth" {
 }
 
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
+  trustHost: true,
   adapter: PrismaAdapter(prisma) as unknown as undefined,
   debug: true,
 
