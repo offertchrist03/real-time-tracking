@@ -69,20 +69,21 @@ const updateLocation = async () => {
     return [];
   }
 
+  // stock les coordonées que l'on vient d'inserer
   let moves = [];
 
   for (let person of people) {
+    // obtenir les coordonées précedentes
     const prevCoord = {
       latitude: person.prevLatitude,
       longitude: person.prevLongitude,
     };
-    console.log("prevCoord => ", prevCoord);
 
+    // obtenir les coordonées actueles
     const currentCoord = {
       latitude: person.latitude,
       longitude: person.longitude,
     };
-    console.log("currentCoord => ", currentCoord);
 
     const getNextCoord = () => {
       if (
@@ -102,8 +103,8 @@ const updateLocation = async () => {
       }
     };
 
+    // génère les nouveaux coordonée
     const nextCoord = getNextCoord();
-    console.log("nextCoord => ", nextCoord);
 
     const move = {
       user_id: person.id,
@@ -111,7 +112,7 @@ const updateLocation = async () => {
       longitude: nextCoord.longitude,
     };
 
-    // changer les coordonees
+    // inserer les nouveaux coordonees
     await pool.query(
       "INSERT INTO movements (user_id, latitude, longitude) VALUES ($1, $2, $3)",
       [move.user_id, move.latitude, move.longitude]
@@ -124,7 +125,7 @@ const updateLocation = async () => {
   return moves;
 };
 
-// Route pour récupérer les mouvements des utilisateurs
+// service qui génère les mouvements des utilisateurs pendant toutes les <INTERVAL> (secondes)
 setInterval(updateLocation, INTERVAL);
 
 app.listen(PORT, () => {

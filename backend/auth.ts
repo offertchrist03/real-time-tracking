@@ -78,8 +78,8 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       return session;
     },
     async redirect() {
-      // Redirect to a custom page after successful sign-in
-      return "/"; // You can change this path
+      // Redirige l'utilisateur vers l'accueil apres succes
+      return "/";
     },
   },
 

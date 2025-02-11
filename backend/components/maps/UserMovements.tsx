@@ -8,10 +8,11 @@ import ToastLoading from "../loading/ToastLoading";
 
 function UserMovements({ user }: { user: UserProps }) {
   const [isLoading, setIsLoading] = useState(true);
+
   // État pour stocker la liste des positions
   const [positions, setPositions] = useState<MouvementProps[] | null>(null);
 
-  // recuperer tous les mouvements utilisateurs
+  // fonction qui recupere tous les mouvements utilisateurs
   const getMovements = async (limit = 50) => {
     try {
       const res = await fetch(
@@ -19,9 +20,7 @@ function UserMovements({ user }: { user: UserProps }) {
       );
       const data: MouvementProps[] = await res.json();
 
-      if (data || !data) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
 
       return data;
     } catch (error) {
@@ -80,7 +79,6 @@ function UserMovements({ user }: { user: UserProps }) {
 
   // Exemple d'actualisation de positions toutes les 5 secondes
   useEffect(() => {
-    // Pour l'exemple, on ajoute une nouvelle position légèrement décalée
     const interval = setInterval(() => {
       if (!(positions && positions.length > 0)) {
         getAllPreviousMovements();
@@ -108,6 +106,7 @@ function UserMovements({ user }: { user: UserProps }) {
     return res;
   };
 
+  // fonction qui trie les coordonnees du plus anciennes au plus recents
   function sortByMovementAtAsc(arr: MouvementProps[]) {
     return arr
       .slice()

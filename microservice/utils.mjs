@@ -1,3 +1,4 @@
+// une fonction qui génère des coordonées aléatoire dans un rayon de <maxDistance> en mètre
 export const generateRandomCoordinate = (
   latitude,
   longitude,
@@ -25,6 +26,7 @@ function toDegrees(radians) {
   return radians * (180 / Math.PI);
 }
 
+// une fonction qui génère un coordonée de façon adjacente au deux dernieres coordonées pour un deplacement plus réel
 export function generateNextCoordinate(
   prevCoord,
   currentCoord,
@@ -78,9 +80,3 @@ export function generateNextCoordinate(
 
   return { latitude: toDegrees(newLat), longitude: toDegrees(newLon) };
 }
-
-// Example usage:
-// const prevCoord = { latitude: 48.8566, longitude: 2.3522 }; // Paris
-// const currentCoord = { latitude: 48.8567, longitude: 2.3523 }; // Slightly shifted
-// const nextCoord = generateNextCoordinate(prevCoord, currentCoord);
-// console.log(nextCoord);

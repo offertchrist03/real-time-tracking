@@ -10,23 +10,23 @@ import MapUsersFilter from "./MapUsersFilter";
 
 function Map({ session }: { session: Session | null }) {
   const [isLoading, setIsLoading] = useState(true);
-
   const [selectUser, setSelectUser] = useState<number | null>(null);
   const [users, setUsers] = useState<UserProps[] | null>(null);
   const [errFetchUsers, setErrFetchUsers] = useState(false);
 
   useEffect(() => {
     if (isLoading) {
-      setIsLoading(false);
+      setIsLoading(false); // Désactive l'état de chargement après le premier rendu
     }
   }, [users]);
 
   useEffect(() => {
     if (errFetchUsers) {
-      setIsLoading(false);
+      setIsLoading(false); // Désactive l'état de chargement en cas d'erreur de récupération
     }
   }, [errFetchUsers]);
-  // recuperer un utilisateur
+
+  // Fonction qui récupère un utilisateur spécifique
   const fetchUser = async (id: string) => {
     if (!id) {
       console.log("No id");
@@ -35,34 +35,30 @@ function Map({ session }: { session: Session | null }) {
 
     try {
       const res = await fetch(`/api/users/${id}`);
-
       const data = await res.json();
 
       if (!data) {
         setErrFetchUsers(true);
       }
 
-      setUsers([data]);
+      setUsers([data]); // Stocke uniquement l'utilisateur récupéré
     } catch (error) {
-      console.error(
-        "Erreur lors de la récupération de l' utilisateur :",
-        error
-      );
+      console.error("Erreur lors de la récupération de l'utilisateur :", error);
       setErrFetchUsers(true);
     }
   };
 
-  // recuperer tous les utilisateurs
+  // Fonction qui récupère tous les utilisateurs avec une limite
   const fetchUsers = async (limit = 20) => {
     try {
       const res = await fetch(`/api/users?limit=${limit}`);
-
       const data = await res.json();
+
       if (!data) {
         setErrFetchUsers(true);
       }
 
-      setUsers(data);
+      setUsers(data); // Stocke la liste des utilisateurs récupérés
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
       setErrFetchUsers(true);
@@ -72,35 +68,33 @@ function Map({ session }: { session: Session | null }) {
   useEffect(() => {
     if (session && session.user) {
       if (session.user.role.toLowerCase() === "admin") {
-        // recupere tous les utilisateur (default limit 20)
-        fetchUsers(20);
+        fetchUsers(20); // Récupère tous les utilisateurs (limite 20 par défaut)
       } else {
-        // recupere la session
-        const id = session.user.id || session.user.name;
+        const id = session.user.id || session.user.name; // Identifiant de l'utilisateur
         fetchUser(id);
       }
     }
   }, []);
 
+  // Fonction pour filtrer les utilisateurs sélectionnés
   const filterUsers = (id: number | null, users: UserProps[] | null) => {
     if (!users) {
       return null;
     }
     if (!id) {
-      return users;
+      return users; // Retourne tous les utilisateurs si aucun filtre n'est appliqué
     }
-    const filteredUsers = users.filter((user) => user.id === selectUser);
-    return filteredUsers;
+    return users.filter((user) => user.id === selectUser);
   };
 
   if (isLoading) {
-    return <ToastLoading text="recuperation des utilisateurs"></ToastLoading>;
+    return <ToastLoading text="récupération des utilisateurs"></ToastLoading>; // Affiche un message de chargement
   }
 
   return (
     <>
-      {!session && <MapCaption></MapCaption>}
-
+      {!session && <MapCaption></MapCaption>}{" "}
+      {/* Affiche une légende si aucun utilisateur n'est connecté */}
       {session &&
         session.user &&
         session.user.role === "admin" &&
@@ -112,7 +106,6 @@ function Map({ session }: { session: Session | null }) {
             setSelectUser={setSelectUser}
           ></MapUsersFilter>
         )}
-
       <LeafletMap users={filterUsers(selectUser, users)}></LeafletMap>
     </>
   );
