@@ -11,7 +11,7 @@ const INTERVAL = process.env.INTERVAL;
 
 app.use(express.json());
 
-// fonction qui recupere les utilisateurs et leurs dernier coordonnees dans la base de donnee
+// Fonction qui récupère les utilisateurs et leurs dernières coordonnées enregistrées dans la base de données.
 const getPeople = async () => {
   try {
     const people = [];
@@ -20,28 +20,29 @@ const getPeople = async () => {
       ["user"]
     );
 
-    // Position initiale  (exemple : Antananarivo)
+    // Position initiale par défaut (exemple : Antananarivo)
     const initialLatitude = -18.8792;
     const initialLongitude = 47.5079;
 
     for (let person of rows) {
-      // recuperer le dernier coordonees
+      // Récupérer les deux dernières coordonnées enregistrées de l'utilisateur
       const { rows: lastCoordinates, rowCount: lastCoordinatesCount } =
         await pool.query(
           "SELECT * FROM movements WHERE user_id = $1 ORDER BY movement_at DESC LIMIT 2",
           [person.id]
         );
 
-      // set previous lat and long
-      console.log("lastCoordinates[0] =>", lastCoordinates[0]);
-      console.log("lastCoordinates[1] =>", lastCoordinates[1]);
+      // Affichage des dernières coordonnées pour débogage
+      // console.log("lastCoordinates[0] =>", lastCoordinates[0]);
+      // console.log("lastCoordinates[1] =>", lastCoordinates[1]);
 
+      // Définir les coordonnées précédentes si disponibles
       if (lastCoordinates && lastCoordinates[1]) {
         person.prevLatitude = lastCoordinates[1].latitude;
         person.prevLongitude = lastCoordinates[1].longitude;
       }
 
-      // set current coordonates if not get initials
+      // Définir les coordonnées actuelles (utiliser les dernières enregistrées ou les coordonnées initiales par défaut)
       person.latitude =
         lastCoordinatesCount && lastCoordinates[0]
           ? lastCoordinates[0].latitude
@@ -56,80 +57,90 @@ const getPeople = async () => {
 
     return people;
   } catch (error) {
+    console.log("⚠️ Aucun utilisateur trouvé.");
     return [];
   }
 };
 
+// Fonction qui met à jour la position des utilisateurs
 const updateLocation = async () => {
-  // recuperer les utilisateurs
-  const people = await getPeople();
+  try {
+    // Récupérer la liste des utilisateurs
+    const people = await getPeople();
 
-  if (!(people && people.length > 0)) {
-    console.log("no people");
-    return [];
-  }
+    // Vérifier si des utilisateurs existent
+    if (!(people && people.length > 0)) {
+      console.log("⚠️ Aucun utilisateur trouvé pour mise à jour.");
+      return;
+    }
 
-  // stock les coordonées que l'on vient d'inserer
-  let moves = [];
+    // Stocker les nouvelles coordonnées insérées
+    let moves = [];
 
-  for (let person of people) {
-    // obtenir les coordonées précedentes
-    const prevCoord = {
-      latitude: person.prevLatitude,
-      longitude: person.prevLongitude,
-    };
+    for (let person of people) {
+      // Définir les coordonnées précédentes
+      const prevCoord = {
+        latitude: person.prevLatitude,
+        longitude: person.prevLongitude,
+      };
 
-    // obtenir les coordonées actueles
-    const currentCoord = {
-      latitude: person.latitude,
-      longitude: person.longitude,
-    };
+      // Définir les coordonnées actuelles
+      const currentCoord = {
+        latitude: person.latitude,
+        longitude: person.longitude,
+      };
 
-    const getNextCoord = () => {
-      if (
-        prevCoord.latitude &&
-        prevCoord.longitude &&
-        currentCoord.latitude &&
-        currentCoord.longitude
-      ) {
-        console.log("generateNextCoordinate()");
-        return generateNextCoordinate(prevCoord, currentCoord);
-      } else {
-        console.log("generateRandomCoordinate()");
-        return generateRandomCoordinate(
-          currentCoord.latitude,
+      // Fonction pour obtenir les nouvelles coordonnées
+      const getNextCoord = () => {
+        if (
+          prevCoord.latitude &&
+          prevCoord.longitude &&
+          currentCoord.latitude &&
           currentCoord.longitude
-        );
-      }
-    };
+        ) {
+          // 📍 Génération de coordonnées adjacentes (déplacement plus réaliste)
+          return generateNextCoordinate(prevCoord, currentCoord);
+        } else {
+          // 📍 Génération de coordonnées aléatoires (point initial)
+          return generateRandomCoordinate(
+            currentCoord.latitude,
+            currentCoord.longitude
+          );
+        }
+      };
 
-    // génère les nouveaux coordonée
-    const nextCoord = getNextCoord();
+      // Générer la nouvelle position
+      const nextCoord = getNextCoord();
 
-    const move = {
-      user_id: person.id,
-      latitude: nextCoord.latitude,
-      longitude: nextCoord.longitude,
-    };
+      // Préparer les données à insérer dans la base de données
+      const move = {
+        user_id: person.id,
+        latitude: nextCoord.latitude,
+        longitude: nextCoord.longitude,
+      };
 
-    // inserer les nouveaux coordonees
-    await pool.query(
-      "INSERT INTO movements (user_id, latitude, longitude) VALUES ($1, $2, $3)",
-      [move.user_id, move.latitude, move.longitude]
-    );
+      // Insérer les nouvelles coordonnées dans la base de données
+      await pool.query(
+        "INSERT INTO movements (user_id, latitude, longitude) VALUES ($1, $2, $3)",
+        [move.user_id, move.latitude, move.longitude]
+      );
 
-    moves.push(move);
+      moves.push(move);
+    }
+
+    console.log("✅ Mouvements mis à jour : ", moves.length);
+  } catch (error) {
+    console.error("❌ Erreur lors de la mise à jour des positions :", error);
+    return null;
   }
-
-  console.log(moves);
-  return moves;
 };
 
-// service qui génère les mouvements des utilisateurs pendant toutes les <INTERVAL> (secondes)
+// Service qui met à jour les mouvements des utilisateurs toutes les <INTERVAL> millisecondes
 setInterval(updateLocation, INTERVAL);
 
+// Démarrer le serveur Express
 app.listen(PORT, () => {
   console.log(
-    `Microservice running on port : ${PORT} ( update interval : ${INTERVAL}ms )`
+    `📡 Microservice démarré sur le port : ${PORT} (mise à jour toutes les ${INTERVAL}ms) 🚀`
   );
 });
