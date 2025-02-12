@@ -76,69 +76,86 @@ Cette application est un système de suivi en temps réel des déplacements de p
 
 1. **Cloner le dépôt GitHub :**
 
-   ```bash
-   git clone https://github.com/offertchrist03/real-time-tracking.git
-   cd real-time-tracking
+```bash
+git clone https://github.com/offertchrist03/real-time-tracking.git
+cd real-time-tracking
 
-   ```
+```
 
 2. **Backend & Frontend (Next.js + Prisma) :**
 
-   ```Navigue dans le dossier backend/ et installe les dépendances :
-   cd backend
-   pnpm install
-   ```
+Navigue dans le dossier `backend/` et installe les dépendances :
 
-```Générer le client Prisma à partir du schéma défini dans le fichier prisma/schema.prisma
-   npx prisma generate
+```
+cd backend
+pnpm install
 ```
 
-```Configure le fichier .env avec les variables nécessaires
-DATABASE_URL
-NEXTAUTH_URL
-AUTH_SECRET
+Générer le client Prisma à partir du schéma défini dans le fichier `prisma/schema.prisma`
+
+```
+npx prisma generate
+```
+
+Configure le fichier `.env` avec les variables nécessaires
+
+```
+DATABASE_URL=
+NEXTAUTH_URL=
+AUTH_SECRET=
 ```
 
 3. **Microservice (Express + pg) :**
 
-   ```Navigue dans le dossier microservice/ et installe les dépendances :
-   cd microservice
-   pnpm install
-   ```
+Navigue dans le dossier `microservice/` et installe les dépendances :
 
-   ```Configure le fichier .env avec les variables nécessaires
-   DB_USER
-   DB_HOST
-   DB_NAME
-   DB_PASS
-   DB_PORT
-   EXPRESS_PORT
-   INTERVAL
-   ```
+```
+cd microservice
+pnpm install
+```
+
+Configurez le fichier `.env` avec les variables nécessaires
+
+```
+DB_USER=
+DB_HOST=
+DB_NAME=
+DB_PASS=
+DB_PORT=
+EXPRESS_PORT=
+INTERVAL=
+```
 
 4. **Initialiser la base de données :**
 
-   ```Exécute le script SQL situé dans /sql pour créer la table users la table movements :
-   psql -U ton_user -d tracking -f sql/init.sql
-   ```
+Exécute le script SQL situé dans `/sql` pour créer la table users la table movements :
 
-```Exécute le script SQL situé dans /sql pour insèrer : 1 admin et les 20 utilisateurs :
-  psql -U ton_user -d tracking -f sql/tests.sql
+```
+psql -U ton_user -d tracking -f sql/init.sql
+```
+
+Exécute le script SQL situé dans `/sql` pour insèrer : 1 admin et les 20 utilisateurs :
+
+```
+psql -U ton_user -d tracking -f sql/tests.sql
 ```
 
 ### Exécution
 
 1. **Lancer le microservice :**
 
-```bash:
+executer dans le terminal :
+
+```
 cd microservice
 pnpm dev
 ```
 
 2. **Lancer le backend/ frontend Next.js :**
 
-```bash:
+executer dans le terminal :
+
+```
 cd backend
 pnpm dev
-
 ```
