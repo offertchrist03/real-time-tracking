@@ -82,7 +82,27 @@ cd real-time-tracking
 
 ```
 
-2. **Backend & Frontend (Next.js + Prisma) :**
+2. **Initialiser la base de données :**
+
+Exécute le script SQL situé dans `/sql` pour créer la base de donnee `real_time_tracking` :
+
+```
+psql -U <utilisateur_postgres> -f <chemin vers>\sql\db.sql
+```
+
+Exécute le script SQL situé dans `/sql` pour créer la table `users` et la table `movements` :
+
+```
+psql -U <utilisateur_postgres> -d real_time_tracking -f <chemin vers>\sql\init.sql
+```
+
+Exécute le script SQL situé dans `/sql` pour insèrer : 1 admin et les 20 utilisateurs :
+
+```
+psql -U <utilisateur_postgres> -d real_time_tracking -f <chemin vers>\sql\tests.sql
+```
+
+3. **Backend & Frontend (Next.js + Prisma) :**
 
 Navigue dans le dossier `backend/` et installe les dépendances :
 
@@ -97,15 +117,15 @@ Générer le client Prisma à partir du schéma défini dans le fichier `prisma/
 npx prisma generate
 ```
 
-Configure le fichier `.env` avec les variables nécessaires
+Configure le fichier `.env` avec les variables nécessaires. exemples :
 
 ```
-DATABASE_URL=
-NEXTAUTH_URL=
-AUTH_SECRET=
+DATABASE_URL=postgresql://<utilisateur_postgres>:<mot_de_passe>@localhost:5432/real_time_tracking
+NEXTAUTH_URL=http://localhost:3000
+AUTH_SECRET=secret
 ```
 
-3. **Microservice (Express + pg) :**
+4. **Microservice (Express + pg) :**
 
 Navigue dans le dossier `microservice/` et installe les dépendances :
 
@@ -114,30 +134,16 @@ cd microservice
 pnpm install
 ```
 
-Configurez le fichier `.env` avec les variables nécessaires
+Configurez le fichier `.env` avec les variables nécessaires. exemples :
 
 ```
-DB_USER=
-DB_HOST=
-DB_NAME=
-DB_PASS=
-DB_PORT=
-EXPRESS_PORT=
-INTERVAL=
-```
-
-4. **Initialiser la base de données :**
-
-Exécute le script SQL situé dans `/sql` pour créer la table users la table movements :
-
-```
-psql -U ton_user -d tracking -f sql/init.sql
-```
-
-Exécute le script SQL situé dans `/sql` pour insèrer : 1 admin et les 20 utilisateurs :
-
-```
-psql -U ton_user -d tracking -f sql/tests.sql
+DB_USER=<utilisateur_postgres>
+DB_HOST=localhost
+DB_NAME=real_time_tracking
+DB_PASS=<mot_de_passe>
+DB_PORT=5432
+EXPRESS_PORT=5000
+INTERVAL=10000
 ```
 
 ### Exécution
