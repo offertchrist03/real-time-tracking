@@ -1,10 +1,10 @@
-# tracking-app
+# Tracking-APP
 
 # Description de l'app
 
 Cette application est un système de suivi en temps réel des déplacements de personnes. Elle se compose de trois parties principales :
 
-- **Microservice** : Un service Node.js (Express + pg) qui génère périodiquement des coordonnées GPS pour 20 personnes. Chaque nouvelle position est calculée aléatoirement (à une distance comprise entre 0 et 50 mètres par rapport à la précédente) et enregistrée dans une base de données PostgreSQL.
+- **Microservice** : Un service Node.js (Express + pg) qui génère périodiquement des coordonnées GPS pour 20 personnes. Chaque nouvelle position est calculée aléatoirement (à une distance comprise entre 0 et 50 mètres par rapport à la précédente et mais suivant la direction adjacentes aux précédentes) et enregistrée dans une base de données PostgreSQL.
 
 - **Backend & Frontend** : Une application Next.js qui gère à la fois l'interface utilisateur et les API RESTful pour récupérer les mouvements enregistrés.  
   **Note :** J'ai utilisé Next.js et Prisma pour le front-end et le back-end.
@@ -148,7 +148,7 @@ executer dans le terminal :
 
 ```
 cd microservice
-pnpm dev
+pnpm start
 ```
 
 2. **Lancer le backend/ frontend Next.js :**
