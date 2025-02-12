@@ -77,7 +77,7 @@ Cette application est un système de suivi en temps réel des déplacements de p
 1. **Cloner le dépôt GitHub :**
 
    ```bash
-   git clone https://github.com/ton-utilisateur/real-time-tracking.git
+   git clone https://github.com/offertchrist03/real-time-tracking.git
    cd real-time-tracking
 
    ```
