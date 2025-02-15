@@ -159,9 +159,23 @@ pnpm start
 
 2. **Lancer le backend/ frontend Next.js :**
 
-executer dans le terminal :
+dans un autre terminal, executer :
 
 ```
 cd backend
 pnpm dev
+```
+
+3. **Tester l'authentification :**
+
+Pour un administrateur, utiliser :
+```
+admin
+1243
+```
+
+Pour un utilisateur, utiliser :
+```
+alice
+password1
 ```
