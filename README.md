@@ -108,7 +108,7 @@ Navigue dans le dossier `backend/` et installe les dépendances :
 
 ```
 cd backend
-pnpm install
+npm install ou pnpm install ou yarn install
 ```
 
 Générer le client Prisma à partir du schéma défini dans le fichier `prisma/schema.prisma`
@@ -131,7 +131,7 @@ Navigue dans le dossier `microservice/` et installe les dépendances :
 
 ```
 cd microservice
-pnpm install
+npm install ou pnpm install ou yarn install
 ```
 
 Configurez le fichier `.env` avec les variables nécessaires. exemples :
@@ -154,7 +154,7 @@ executer dans le terminal :
 
 ```
 cd microservice
-pnpm start
+npm run start ou pnpm start ou yarn start
 ```
 
 2. **Lancer le backend/ frontend Next.js :**
@@ -163,7 +163,7 @@ dans un autre terminal, executer :
 
 ```
 cd backend
-pnpm dev
+npm run dev ou pnpm dev ou yarn dev
 ```
 
 3. **Tester l'authentification :**
