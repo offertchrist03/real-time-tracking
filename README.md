@@ -119,7 +119,7 @@ NEXTAUTH_URL=http://localhost:3000
 AUTH_SECRET=secret
 ```
 
-Générer le client Prisma à partir du schéma défini dans le fichier `prisma/schema.prisma`
+Migration de la base de donnée et générer le client Prisma à partir du schéma défini dans le fichier `prisma/schema.prisma`
 
 ```
 npx prisma migrate dev --name first
