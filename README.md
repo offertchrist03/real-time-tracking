@@ -111,18 +111,18 @@ cd backend
 npm install ou pnpm install ou yarn install
 ```
 
-Générer le client Prisma à partir du schéma défini dans le fichier `prisma/schema.prisma`
-
-```
-npx prisma generate
-```
-
 Configure le fichier `.env` avec les variables nécessaires. exemples :
 
 ```
 DATABASE_URL=postgresql://<utilisateur_postgres>:<mot_de_passe>@localhost:5432/real_time_tracking
 NEXTAUTH_URL=http://localhost:3000
 AUTH_SECRET=secret
+```
+
+Générer le client Prisma à partir du schéma défini dans le fichier `prisma/schema.prisma`
+
+```
+npx prisma migrate dev --name first
 ```
 
 4. **Microservice (Express + pg) :**
