@@ -54,7 +54,7 @@ Cette application est un système de suivi en temps réel des déplacements de p
 
 - **Base de données** : PostgreSQL.
 
-- **Authentification** : NextAuth.js.
+- **Authentification** : Auth.js.
 
 - **Cartographie** :
 
